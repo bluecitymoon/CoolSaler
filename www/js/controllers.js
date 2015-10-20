@@ -1,4 +1,4 @@
-angular.module('starter.controllers', [])
+angular.module('starter.controllers', ['ionic-datepicker'])
 
     .controller('DashCtrl', function ($scope, $state) {
         $scope.signIn = function (user) {
@@ -51,11 +51,15 @@ angular.module('starter.controllers', [])
         }
     })
 
-    .controller('CustomerDetailController', function ($scope, CustomerService, $stateParams, $state) {
+    .controller('CustomerDetailController', function ($scope, CustomerService, $stateParams, $ionicHistory) {
 
         $scope.customer = null;
 
         var customerId = $stateParams.customerId;
+
+        $scope.goBack = function() {
+            $ionicHistory.goBack();
+        };
 
         var AMapArea = document.getElementById('mapContainer');
 
@@ -105,8 +109,12 @@ angular.module('starter.controllers', [])
             str += '<div>是否经过偏移：' + (data.isConverted ? '是' : '否') + '</div>';
             result.innerHTML = str;
 
-            $scope.geolocation.getCurrentPosition();
+            $scope.$emit('map_created');
         };
+
+        $scope.$on('map_created', function() {
+            $scope.geolocation.getCurrentPosition();
+        });
 
         //解析定位错误信息
         function onError(data) {
