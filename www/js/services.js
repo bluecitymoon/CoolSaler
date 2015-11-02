@@ -1,6 +1,56 @@
 angular.module('starter.services', [])
 
-.factory('Chats', function() {
+    .factory('AuthenticationService', function($http, ServerRoot, $rootScope) {
+
+      function getToken(user) {
+
+          $http({
+              url: ServerRoot + 'jsyanzheng/yz',
+              data: user,
+              method: 'POST'
+          }).success(function(response) {
+
+              $rootScope.$emit('login-event', {response : response});
+
+          }).error(function(response) {
+                //TODO
+          });
+
+      }
+      return {
+        getToken: getToken
+      }
+    })
+
+    .factory('StorageService', function ($window) {
+
+        return {
+            get: function (key) {
+
+                var value = '';
+                try {
+                    value = $window.localStorage[key];
+                } catch (e) {
+                }
+
+                return value;
+            },
+            set: function (key, value) {
+                $window.localStorage[key] = value;
+            },
+            setObject: function (key, value) {
+                $window.localStorage[key] = JSON.stringify(value);
+            },
+            getObject: function (key) {
+                return JSON.parse($window.localStorage[key] || '{}');
+            },
+            getArray: function (key) {
+                return JSON.parse($window.localStorage[key] || '[]');
+            }
+        };
+    })
+    
+    .factory('Chats', function() {
   // Might use a resource here that returns a JSON array
 
   // Some fake testing data

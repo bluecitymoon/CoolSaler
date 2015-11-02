@@ -1,8 +1,38 @@
 angular.module('starter.controllers', ['ionic-datepicker'])
 
-    .controller('DashCtrl', function ($scope, $state) {
+    .controller('DashCtrl', function ($scope, AuthenticationService, $state, $rootScope) {
+
         $scope.signIn = function (user) {
-            $state.go('tab.chats');
+
+            if (user && user.username && user.password) {
+
+                AuthenticationService.getToken(user);
+
+            } else {
+
+                alert('请输入用户和密码！');
+            }
+
+            $rootScope.$on('login-event', function(event, data) {
+
+                var response = data.response;
+
+                if (response && response.code) {
+
+                    switch (response.code) {
+
+                        case 6:
+                            $state.go('tab.chats');
+                            break;
+                        default:
+
+                            alert(response.message);
+                            break;
+                    }
+                }
+
+            });
+
             //$scope.$emit('customer_list_refresh');
         };
     })

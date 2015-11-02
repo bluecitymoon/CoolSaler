@@ -10,6 +10,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
     .constant('basicURL', 'http://localhost:8080/crud/rest/')
     .constant('mapkey', 'f42572d0237047d15f2a6306b7e763b7')
 
+    .constant('ServerRoot', 'http://www.hanthink.cc:808/hanthinkapi/')
     .run(function ($ionicPlatform) {
         $ionicPlatform.ready(function () {
             // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
