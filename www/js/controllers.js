@@ -1,6 +1,6 @@
 angular.module('starter.controllers', ['ionic-datepicker'])
 
-    .controller('DashCtrl', function ($scope, AuthenticationService, $state, $rootScope) {
+    .controller('DashCtrl', function ($scope, AuthenticationService, $state, $rootScope, $ionicPopup) {
 
         $scope.signIn = function (user) {
 
@@ -10,7 +10,18 @@ angular.module('starter.controllers', ['ionic-datepicker'])
 
             } else {
 
-                alert('请输入用户和密码！');
+
+                var alertPopup = $ionicPopup.alert({
+                    title: '提示信息',
+                    template: '<h4 style="white-space: nowrap; color: #e42012 ">请输入用户和密码！</h4>',
+                    okText: '确定',
+                    okType: 'button button-block button-calm'
+                });
+
+                //alertPopup.then(function (res) {
+                //
+                //});
+
             }
 
             $rootScope.$on('login-event', function(event, data) {

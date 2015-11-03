@@ -3,16 +3,19 @@ angular.module('starter.services', [])
     .factory('AuthenticationService', function($http, ServerRoot, $rootScope) {
 
       function getToken(user) {
+          var json = "{code:6,token: \"0DPiKuNIrrVmD8IUCuw1hQxNqZc=\", message:\"登录成功\"}";
+          alert(JSON.parse(json));
 
           $http({
               url: ServerRoot + 'jsyanzheng/yz',
               data: user,
               method: 'POST'
-          }).success(function(response) {
+          }).success(function(response, status, headers, config) {
+
 
               $rootScope.$emit('login-event', {response : response});
 
-          }).error(function(response) {
+          }).error(function(response, status, headers, config) {
                 //TODO
           });
 
