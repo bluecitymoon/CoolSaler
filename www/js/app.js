@@ -5,12 +5,18 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
+var user = null;
+var mode = 'DEBUG';
 angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
 
     .constant('basicURL', 'http://localhost:8080/crud/rest/')
     .constant('mapkey', 'f42572d0237047d15f2a6306b7e763b7')
 
     .constant('ServerRoot', 'http://www.hanthink.cc:808/hanthinkapi/')
+    .config(function($httpProvider) {
+    //Enable cross domain calls
+        $httpProvider.defaults.useXDomain = true;
+    })
     .run(function ($ionicPlatform) {
         $ionicPlatform.ready(function () {
             // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -40,7 +46,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
             .state('sign-in', {
                 url: '/sign-in',
                 templateUrl: 'templates/sign-in.html',
-                controller: 'DashCtrl'
+                controller: 'LoginCtrl'
             })
 
             .state('tab', {
@@ -51,12 +57,22 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
 
             // Each tab has its own nav history stack:
 
-            .state('tab.dash', {
-                url: '/dash',
+            .state('tab.reporttypes', {
+                url: '/reporttypes',
                 views: {
-                    'tab-dash': {
-                        templateUrl: 'templates/tab-dash.html',
-                        controller: 'DashCtrl'
+                    'tab-reporttypes': {
+                        templateUrl: 'templates/tab-report.html',
+                        controller: 'ReportTypesCtrl'
+                    }
+                }
+            })
+
+            .state('tab.data', {
+                url: '/data',
+                views: {
+                    'tab-data': {
+                        templateUrl: 'templates/tab-data.html',
+                        controller: 'DataCtrl'
                     }
                 }
             })

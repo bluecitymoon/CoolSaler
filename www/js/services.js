@@ -3,8 +3,7 @@ angular.module('starter.services', [])
     .factory('AuthenticationService', function($http, ServerRoot, $rootScope) {
 
       function getToken(user) {
-          var json = "{code:6,token: \"0DPiKuNIrrVmD8IUCuw1hQxNqZc=\", message:\"登录成功\"}";
-          alert(JSON.parse(json));
+
 
           $http({
               url: ServerRoot + 'jsyanzheng/yz',
@@ -23,6 +22,62 @@ angular.module('starter.services', [])
       return {
         getToken: getToken
       }
+    })
+
+    .factory('ReportService', function($http, ServerRoot, $rootScope) {
+
+        var userData = null;
+        if (mode == 'DEBUG') {
+            userData = {username:'admin', token: '0DPiKuNIrrVmD8IUCuw1hQxNqZc='};
+        } else {
+            userData = {username : user.username, token : user.token};
+        }
+
+        function getTypes() {
+
+            $http({
+                url: ServerRoot + 'report/getreport',
+                data: userData,
+                method: 'POST'
+            }).success(function(response, status, headers, config) {
+
+
+                if (response.code) {
+
+                } else {
+                    $rootScope.$emit('report-type-load-event', {types : response});
+                }
+
+            }).error(function(response, status, headers, config) {
+                //TODO
+            });
+
+        }
+        return {
+            getTypes: getTypes
+        }
+    })
+
+    .factory('UtilService', function($ionicLoading) {
+
+        function showLoadingScreen(message) {
+
+            var msg = '正在载入';
+            if (message) {
+                msg = message;
+            }
+            $ionicLoading.show({
+                template: '<ion-spinner icon=\"spiral\"></ion-spinner> ' + msg
+            });
+        }
+
+        function closeLoadingScreen() {
+            $ionicLoading.hide();
+        }
+        return {
+            showLoadingScreen : showLoadingScreen,
+            closeLoadingScreen : closeLoadingScreen
+        }
     })
 
     .factory('StorageService', function ($window) {

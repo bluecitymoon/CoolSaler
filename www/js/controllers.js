@@ -1,8 +1,10 @@
 angular.module('starter.controllers', ['ionic-datepicker'])
 
-    .controller('DashCtrl', function ($scope, AuthenticationService, $state, $rootScope, $ionicPopup) {
+    .controller('LoginCtrl', function ($scope, AuthenticationService, $state, $rootScope, $ionicPopup, UtilService) {
 
         $scope.signIn = function (user) {
+
+            UtilService.showLoadingScreen('正在登录');
 
             if (user && user.username && user.password) {
 
@@ -10,17 +12,13 @@ angular.module('starter.controllers', ['ionic-datepicker'])
 
             } else {
 
-
+                UtilService.closeLoadingScreen();
                 var alertPopup = $ionicPopup.alert({
                     title: '提示信息',
-                    template: '<h4 style="white-space: nowrap; color: #e42012 ">请输入用户和密码！</h4>',
+                    template: '<h4 style="white-space: nowrap; ">请输入用户和密码！</h4>',
                     okText: '确定',
                     okType: 'button button-block button-calm'
                 });
-
-                //alertPopup.then(function (res) {
-                //
-                //});
 
             }
 
@@ -32,8 +30,10 @@ angular.module('starter.controllers', ['ionic-datepicker'])
 
                     switch (response.code) {
 
-                        case 6:
+                        case "6":
                             $state.go('tab.chats');
+
+                            user = response;
                             break;
                         default:
 
@@ -42,18 +42,53 @@ angular.module('starter.controllers', ['ionic-datepicker'])
                     }
                 }
 
+                UtilService.closeLoadingScreen();
             });
 
             //$scope.$emit('customer_list_refresh');
         };
     })
 
+    .controller('DataCtrl', function() {
+
+    })
+    .controller('ReportTypesCtrl', function($scope, ReportService, $rootScope) {
+
+        $scope.$on('$ionicView.enter', function(e) {
+            ReportService.getTypes();
+        });
+
+        $scope.types = [];
+
+        $rootScope.$on('report-type-load-event', function(event, data) {
+
+            if (data.types) {
+                $scope.types = data.types;
+
+                $scope.$applyAsync();
+            }
+        });
+    })
+
+    //.controller('ReportTypesCtrl', function ($scope, ReportService, $rootScope) {
+    //
+    //    //$scope.$on('$ionicView.enter', function(e) {
+    //    //    ReportService.getTypes();
+    //    //});
+    //    //
+    //    $rootScope.on('report-type-load-event', function(event, data) {
+    //
+    //        if (data.types) {
+    //            $scope.types = data.types;
+    //        }
+    //    });
+    //    ReportService.getTypes();
+    //    $scope.types = [];
+    //
+    //})
+
     .controller('ChatsCtrl', function ($scope, Chats) {
-        // With the new view caching in Ionic, Controllers are only called
-        // when they are recreated or on app start, instead of every page change.
-        // To listen for when this page is active (for example, to refresh data),
-        // listen for the $ionicView.enter event:
-        //
+
         //$scope.$on('$ionicView.enter', function(e) {
         //});
 
