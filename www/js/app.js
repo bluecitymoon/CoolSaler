@@ -67,6 +67,12 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
                 }
             })
 
+            .state('report-search', {
+                url: '/searchreport/:typeid',
+                templateUrl: 'templates/search-report.html',
+                controller: 'ReportSearchCtrl'
+
+            })
             .state('tab.data', {
                 url: '/data',
                 views: {

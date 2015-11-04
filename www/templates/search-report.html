@@ -1,0 +1,21 @@
+<ion-view view-title="搜索报表">
+
+  <ion-nav-buttons side="left">
+    <div class="button button-clear" ng-click="goback()">
+      返回
+    </div>
+  </ion-nav-buttons>
+
+  <ion-content>
+
+    <ion-list>
+      <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="condition in conditions" type="item-text-wrap">
+        {{condition.name}}
+      </ion-item>
+    </ion-list>
+
+  </ion-content>
+  <div class="bar bar-footer bar-positive" ng-click="searchReport()">
+    <button class="button button-clear title">搜索</button>
+  </div>
+</ion-view>
