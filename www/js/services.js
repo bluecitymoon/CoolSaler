@@ -24,7 +24,7 @@ angular.module('starter.services', [])
       }
     })
 
-    .factory('ReportService', function($http, ServerRoot, $rootScope) {
+    .factory('ReportService', function($http, ServerRoot, $rootScope, UtilService) {
 
         var userData = null;
         if (mode == 'DEBUG') {
@@ -43,7 +43,7 @@ angular.module('starter.services', [])
 
 
                 if (response.code) {
-
+                    UtilService.showAlert(response.message);
                 } else {
                     $rootScope.$emit('report-type-load-event', {types : response});
                 }
@@ -74,9 +74,26 @@ angular.module('starter.services', [])
         function closeLoadingScreen() {
             $ionicLoading.hide();
         }
+
+        function showAlert(message, callback) {
+
+            var alertPopup = $ionicPopup.alert({
+                title: '提示信息',
+                template: '<h4 style="white-space: nowrap; "> ' + message + '</h4>',
+                okText: '确定',
+                okType: 'button button-block button-calm'
+            });
+
+            if (callback) {
+                alertPopup.then(function () {
+                    callback();
+                });
+            }
+        }
         return {
-            showLoadingScreen : showLoadingScreen,
-            closeLoadingScreen : closeLoadingScreen
+            showLoadingScreen   : showLoadingScreen,
+            closeLoadingScreen  : closeLoadingScreen,
+            showAlert           : showAlert
         }
     })
 

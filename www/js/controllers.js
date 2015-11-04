@@ -13,12 +13,8 @@ angular.module('starter.controllers', ['ionic-datepicker'])
             } else {
 
                 UtilService.closeLoadingScreen();
-                var alertPopup = $ionicPopup.alert({
-                    title: '提示信息',
-                    template: '<h4 style="white-space: nowrap; ">请输入用户和密码！</h4>',
-                    okText: '确定',
-                    okType: 'button button-block button-calm'
-                });
+
+                UtilService.showAlert('请输入用户和密码！');
 
             }
 
@@ -37,7 +33,7 @@ angular.module('starter.controllers', ['ionic-datepicker'])
                             break;
                         default:
 
-                            alert(response.message);
+                            UtilService.showAlert(response.message);
                             break;
                     }
                 }
@@ -45,7 +41,6 @@ angular.module('starter.controllers', ['ionic-datepicker'])
                 UtilService.closeLoadingScreen();
             });
 
-            //$scope.$emit('customer_list_refresh');
         };
     })
 
