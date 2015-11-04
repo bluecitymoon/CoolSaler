@@ -15,7 +15,14 @@ angular.module('starter.services', [])
               $rootScope.$emit('login-event', {response : response});
 
           }).error(function(response, status, headers, config) {
-                //TODO
+
+              response.code = "500";
+              if (!response.message) {
+
+                  response.message = "服务器发生了错误。";
+              }
+              $rootScope.$emit('login-event', {response : response});
+
           });
 
       }
