@@ -9,9 +9,15 @@
   <ion-content>
 
     <ion-list>
-      <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="condition in conditions" type="item-text-wrap">
-        {{condition.name}}
-      </ion-item>
+
+        <label class="item item-input" ng-repeat="condition in conditions">
+          <span class="input-label">{{condition.mingcheng}}</span>
+          <div ng-switch="condition.sjleixing">
+              <input ng-switch-when="varchar(4000)" type="text" ng-model="condition.username" placeholder="{{condition.id}}">
+          </div>
+
+        </label>
+
     </ion-list>
 
   </ion-content>

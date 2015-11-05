@@ -56,15 +56,23 @@ angular.module('starter.services', [])
 
         function loadReportSearchConditions(reportid) {
 
+            var copiedUserData = userData;
+            copiedUserData.bbid = reportid;
+
             $http({
-                url: ServerRoot + 'report/getreport',
-                data: userData,
+                url: ServerRoot + 'report/getreporttj',
+                data: copiedUserData,
                 method: 'POST'
             }).success(function(response, status, headers, config) {
 
+                console.debug(response);
 
                 if (response.code) {
+
+                    UtilService.closeLoadingScreen();
+
                     UtilService.showAlert(response.message);
+
                 } else {
                     $rootScope.$emit('search-report-conditions-load-event', {conditions : response});
                 }

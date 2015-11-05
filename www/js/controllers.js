@@ -65,11 +65,15 @@ angular.module('starter.controllers', ['ionic-datepicker'])
         });
     })
 
-    .controller('ReportSearchCtrl', function($scope, ReportService, $rootScope, $stateParams, $ionicHistory) {
+    .controller('ReportSearchCtrl', function($scope, ReportService, $rootScope, $stateParams, $ionicHistory, UtilService) {
 
-        var typeId = $stateParams.typeid;
+        $scope.$on('$ionicView.enter', function(e) {
 
-        ReportService.loadReportSearchConditions(typeId);
+            UtilService.showLoadingScreen('正在载入');
+            var typeId = $stateParams.typeid;
+
+            ReportService.loadReportSearchConditions(typeId);
+        });
 
         $scope.conditions = [];
 
@@ -78,6 +82,7 @@ angular.module('starter.controllers', ['ionic-datepicker'])
             if (data.conditions) {
                 $scope.conditions = data.conditions;
             }
+            UtilService.closeLoadingScreen();
         });
 
         $scope.goback = function() {
