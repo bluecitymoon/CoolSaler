@@ -60,12 +60,33 @@ angular.module('starter.services', [])
             });
 
         }
+
+        function loadReportSearchConditions(reportid) {
+
+            $http({
+                url: ServerRoot + 'report/getreport',
+                data: userData,
+                method: 'POST'
+            }).success(function(response, status, headers, config) {
+
+
+                if (response.code) {
+                    UtilService.showAlert(response.message);
+                } else {
+                    $rootScope.$emit('search-report-conditions-load-event', {conditions : response});
+                }
+
+            }).error(function(response, status, headers, config) {
+                //TODO
+            });
+        }
         return {
-            getTypes: getTypes
+            getTypes: getTypes,
+            loadReportSearchConditions: loadReportSearchConditions
         }
     })
 
-    .factory('UtilService', function($ionicLoading) {
+    .factory('UtilService', function($ionicLoading, $ionicPopup) {
 
         function showLoadingScreen(message) {
 

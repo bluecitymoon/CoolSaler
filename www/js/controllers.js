@@ -60,27 +60,30 @@ angular.module('starter.controllers', ['ionic-datepicker'])
             if (data.types) {
                 $scope.types = data.types;
 
-                $scope.$applyAsync();
+                //$scope.$applyAsync();
             }
         });
     })
 
-    //.controller('ReportTypesCtrl', function ($scope, ReportService, $rootScope) {
-    //
-    //    //$scope.$on('$ionicView.enter', function(e) {
-    //    //    ReportService.getTypes();
-    //    //});
-    //    //
-    //    $rootScope.on('report-type-load-event', function(event, data) {
-    //
-    //        if (data.types) {
-    //            $scope.types = data.types;
-    //        }
-    //    });
-    //    ReportService.getTypes();
-    //    $scope.types = [];
-    //
-    //})
+    .controller('ReportSearchCtrl', function($scope, ReportService, $rootScope, $stateParams, $ionicHistory) {
+
+        var typeId = $stateParams.typeid;
+
+        ReportService.loadReportSearchConditions(typeId);
+
+        $scope.conditions = [];
+
+        $rootScope.$on('search-report-conditions-load-event', function(event, data) {
+
+            if (data.conditions) {
+                $scope.conditions = data.conditions;
+            }
+        });
+
+        $scope.goback = function() {
+            $ionicHistory.goBack();
+        };
+    })
 
     .controller('ChatsCtrl', function ($scope, Chats) {
 
