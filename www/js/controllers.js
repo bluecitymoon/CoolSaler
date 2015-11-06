@@ -18,7 +18,7 @@ angular.module('starter.controllers', ['ionic-datepicker'])
 
             }
 
-            $rootScope.$on('login-event', function(event, data) {
+            $rootScope.$on('login-event', function (event, data) {
 
                 var response = data.response;
 
@@ -44,18 +44,18 @@ angular.module('starter.controllers', ['ionic-datepicker'])
         };
     })
 
-    .controller('DataCtrl', function() {
+    .controller('DataCtrl', function () {
 
     })
-    .controller('ReportTypesCtrl', function($scope, ReportService, $rootScope) {
+    .controller('ReportTypesCtrl', function ($scope, ReportService, $rootScope) {
 
-        $scope.$on('$ionicView.enter', function(e) {
+        $scope.$on('$ionicView.enter', function (e) {
             ReportService.getTypes();
         });
 
         $scope.types = [];
 
-        $rootScope.$on('report-type-load-event', function(event, data) {
+        $rootScope.$on('report-type-load-event', function (event, data) {
 
             if (data.types) {
                 $scope.types = data.types;
@@ -65,9 +65,9 @@ angular.module('starter.controllers', ['ionic-datepicker'])
         });
     })
 
-    .controller('ReportSearchCtrl', function($scope, ReportService, $rootScope, $stateParams, $ionicHistory, UtilService) {
+    .controller('ReportSearchCtrl', function ($scope, ReportService, $rootScope, $stateParams, $ionicHistory, UtilService, $ionicModal) {
 
-        $scope.$on('$ionicView.enter', function(e) {
+        $scope.$on('$ionicView.enter', function (e) {
 
             UtilService.showLoadingScreen('正在载入');
             var typeId = $stateParams.typeid;
@@ -77,7 +77,7 @@ angular.module('starter.controllers', ['ionic-datepicker'])
 
         $scope.conditions = [];
 
-        $rootScope.$on('search-report-conditions-load-event', function(event, data) {
+        $rootScope.$on('search-report-conditions-load-event', function (event, data) {
 
             if (data.conditions) {
                 $scope.conditions = data.conditions;
@@ -85,9 +85,88 @@ angular.module('starter.controllers', ['ionic-datepicker'])
             UtilService.closeLoadingScreen();
         });
 
-        $scope.goback = function() {
+        $scope.openAutoComplete = function (condition) {
+
+            if (condition.cankaodangan) {
+                //alert(JSON.stringify(condition));
+                $scope.openModal();
+            }
+
+        };
+
+        $scope.goback = function () {
             $ionicHistory.goBack();
         };
+
+        var weekDaysList = ["六", "日", "一", "二", "三", "四", "五"];
+        var monthList = ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"];
+
+        $scope.datepickerObject = {
+            titleLabel: '选择日期',  //Optional
+            todayLabel: '今天',  //Optional
+            closeLabel: '关闭',  //Optional
+            setLabel: '设置',  //Optional
+            setButtonType : 'button-assertive',  //Optional
+            todayButtonType : 'button-calm',  //Optional
+            closeButtonType : 'button-calm',  //Optional
+            inputDate: new Date(),  //Optional
+            mondayFirst: true,  //Optional
+            //disabledDates: disabledDates, //Optional
+            weekDaysList: weekDaysList, //Optional
+            monthList: monthList, //Optional
+            templateType: 'modal', //Optional
+            showTodayButton: 'true', //Optional
+            modalHeaderColor: 'bar-positive', //Optional
+            modalFooterColor: 'bar-positive', //Optional
+            from: new Date(2000, 8, 2), //Optional
+            to: new Date(2020, 8, 25),  //Optional
+            callback: function (val) {  //Mandatory
+                datePickerCallback(val);
+            },
+            dateFormat: 'yyyy/MM/dd', //Optional
+            closeOnSelect: false //Optional
+        };
+
+        function datePickerCallback(val) {
+
+            if (typeof(val) === 'undefined') {
+                console.log('Date not selected');
+            } else {
+                console.log('Selected date is : ', val);
+            }
+        }
+
+        $ionicModal.fromTemplateUrl('templates/modal/auto-complete-content.html', {
+            scope: $scope,
+            animation: 'slide-in-up'
+        }).then(function (modal) {
+            $scope.modal = modal;
+        });
+
+        $scope.openModal = function () {
+            $scope.modal.show();
+        };
+
+        $scope.closeAutoCompleteDialog = function () {
+            $scope.modal.hide();
+        };
+
+        //Cleanup the modal when we're done with it!
+        $scope.$on('$destroy', function () {
+            $scope.modal.remove();
+        });
+
+        // Execute action on hide modal
+        $scope.$on('modal.hidden', function () {
+            // Execute action
+        });
+
+        // Execute action on remove modal
+        $scope.$on('modal.removed', function () {
+            // Execute action
+        });
+
+
     })
 
     .controller('ChatsCtrl', function ($scope, Chats) {
@@ -136,7 +215,7 @@ angular.module('starter.controllers', ['ionic-datepicker'])
 
         var customerId = $stateParams.customerId;
 
-        $scope.goBack = function() {
+        $scope.goBack = function () {
             $ionicHistory.goBack();
         };
 
@@ -151,7 +230,7 @@ angular.module('starter.controllers', ['ionic-datepicker'])
         $scope.map = new AMap.Map('mapContainer', {
             resizeEnable: true
         });
-        $scope.map.plugin('AMap.Geolocation', function() {
+        $scope.map.plugin('AMap.Geolocation', function () {
             $scope.geolocation = new AMap.Geolocation({
                 enableHighAccuracy: true,//是否使用高精度定位，默认:true
                 timeout: 10000,          //超过10秒后停止定位，默认：无穷大
@@ -170,12 +249,12 @@ angular.module('starter.controllers', ['ionic-datepicker'])
             AMap.event.addListener($scope.geolocation, 'error', onError);      //返回定位出错信息
         });
         //获取当前位置信息
-        $scope.getCurrentPosition = function() {
+        $scope.getCurrentPosition = function () {
             $scope.geolocation.getCurrentPosition();
         }
         ;
         //监控当前位置并获取当前位置信息
-        $scope.watchPosition = function() {
+        $scope.watchPosition = function () {
             $scope.geolocation.watchPosition();
         };
 
@@ -191,7 +270,7 @@ angular.module('starter.controllers', ['ionic-datepicker'])
             $scope.$emit('map_created');
         };
 
-        $scope.$on('map_created', function() {
+        $scope.$on('map_created', function () {
             $scope.geolocation.getCurrentPosition();
         });
 
