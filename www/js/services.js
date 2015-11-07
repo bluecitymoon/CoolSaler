@@ -1,43 +1,45 @@
 angular.module('starter.services', [])
 
-    .factory('AuthenticationService', function($http, ServerRoot, $rootScope) {
+    .factory('AuthenticationService', function ($http, ServerRoot, $rootScope) {
 
-      function getToken(user) {
-
-
-          $http({
-              url: ServerRoot + 'jsyanzheng/yz',
-              data: user,
-              method: 'POST'
-          }).success(function(response, status, headers, config) {
+        function getToken(user) {
 
 
-              $rootScope.$emit('login-event', {response : response});
+            $http({
+                url: ServerRoot + 'jsyanzheng/yz',
+                data: user,
+                method: 'POST'
+            }).success(function (response, status, headers, config) {
 
-          }).error(function(response, status, headers, config) {
 
-              response.code = "500";
-              if (!response.message) {
+                $rootScope.$emit('login-event', {response: response});
+                console.debug(response);
 
-                  response.message = "服务器发生了错误。";
-              }
-              $rootScope.$emit('login-event', {response : response});
+            }).error(function (response, status, headers, config) {
 
-          });
+                response.code = "500";
+                if (!response.message) {
 
-      }
-      return {
-        getToken: getToken
-      }
+                    response.message = "服务器发生了错误。";
+                }
+                $rootScope.$emit('login-event', {response: response});
+
+            });
+
+        }
+
+        return {
+            getToken: getToken
+        }
     })
 
-    .factory('ReportService', function($http, ServerRoot, $rootScope, UtilService) {
+    .factory('ReportService', function ($http, ServerRoot, $rootScope, UtilService) {
 
         var userData = null;
         if (mode == 'DEBUG') {
-            userData = {username:'admin', token: '0DPiKuNIrrVmD8IUCuw1hQxNqZc='};
+            userData = {username: 'admin', token: '0DPiKuNIrrVmD8IUCuw1hQxNqZc='};
         } else {
-            userData = {username : user.username, token : user.token};
+            userData = {username: loginUser.username, token: loginUser.token};
         }
 
         function getTypes() {
@@ -46,16 +48,16 @@ angular.module('starter.services', [])
                 url: ServerRoot + 'report/getreport',
                 data: userData,
                 method: 'POST'
-            }).success(function(response, status, headers, config) {
+            }).success(function (response, status, headers, config) {
 
 
                 if (response.code) {
                     UtilService.showAlert(response.message);
                 } else {
-                    $rootScope.$emit('report-type-load-event', {types : response});
+                    $rootScope.$emit('report-type-load-event', {types: response});
                 }
 
-            }).error(function(response, status, headers, config) {
+            }).error(function (response, status, headers, config) {
                 //TODO
             });
 
@@ -63,14 +65,14 @@ angular.module('starter.services', [])
 
         function loadReportSearchConditions(reportid) {
 
-            var copiedUserData = userData;
-            copiedUserData.bbid = reportid;
+            //var copiedUserData = userData;
+            //copiedUserData.bbid = reportid;
 
             $http({
                 url: ServerRoot + 'report/getreporttj',
-                data: copiedUserData,
+                data: {username: loginUser.username, token: loginUser.token, bbid: reportid},
                 method: 'POST'
-            }).success(function(response, status, headers, config) {
+            }).success(function (response, status, headers, config) {
 
                 console.debug(response);
 
@@ -81,20 +83,52 @@ angular.module('starter.services', [])
                     UtilService.showAlert(response.message);
 
                 } else {
-                    $rootScope.$emit('search-report-conditions-load-event', {conditions : response});
+                    $rootScope.$emit('search-report-conditions-load-event', {conditions: response});
                 }
 
-            }).error(function(response, status, headers, config) {
+            }).error(function (response, status, headers, config) {
                 //TODO
             });
         }
+
+        //canzhaoshuju/getshuju
+
+        function loadReportAutocompleteOptions(cankaodangan) {
+
+            //var copiedUserData = userData;
+            //copiedUserData.cankaodangan = cankaodangan;
+            $http({
+                url: ServerRoot + 'canzhaoshuju/getshuju',
+                data: {username: loginUser.username, token: loginUser.token, cankaodangan: cankaodangan},
+                method: 'POST'
+            }).success(function (response, status, headers, config) {
+
+                console.debug(response);
+
+                if (response.code) {
+
+                    UtilService.closeLoadingScreen();
+
+                    UtilService.showAlert(response.message);
+
+                } else {
+                    $rootScope.$emit('search-report-options-load-event', {conditions: response});
+                }
+
+            }).error(function (response, status, headers, config) {
+                //TODO
+            });
+        }
+
         return {
             getTypes: getTypes,
-            loadReportSearchConditions: loadReportSearchConditions
+            loadReportSearchConditions: loadReportSearchConditions,
+            loadReportAutocompleteOptions: loadReportAutocompleteOptions
         }
     })
 
-    .factory('UtilService', function($ionicLoading, $ionicPopup) {
+    .
+    factory('UtilService', function ($ionicLoading, $ionicPopup) {
 
         function showLoadingScreen(message) {
 
@@ -126,10 +160,11 @@ angular.module('starter.services', [])
                 });
             }
         }
+
         return {
-            showLoadingScreen   : showLoadingScreen,
-            closeLoadingScreen  : closeLoadingScreen,
-            showAlert           : showAlert
+            showLoadingScreen: showLoadingScreen,
+            closeLoadingScreen: closeLoadingScreen,
+            showAlert: showAlert
         }
     })
 
@@ -160,123 +195,123 @@ angular.module('starter.services', [])
             }
         };
     })
-    
-    .factory('Chats', function() {
-  // Might use a resource here that returns a JSON array
 
-  // Some fake testing data
-  var chats = [{
-    id: 0,
-    name: 'Ben Sparrow',
-    lastText: 'You on your way?',
-    face: 'https://pbs.twimg.com/profile_images/514549811765211136/9SgAuHeY.png'
-  }, {
-    id: 1,
-    name: 'Max Lynx',
-    lastText: 'Hey, it\'s me',
-    face: 'https://avatars3.githubusercontent.com/u/11214?v=3&s=460'
-  }, {
-    id: 2,
-    name: 'Adam Bradleyson',
-    lastText: 'I should buy a boat',
-    face: 'https://pbs.twimg.com/profile_images/479090794058379264/84TKj_qa.jpeg'
-  }, {
-    id: 3,
-    name: 'Perry Governor',
-    lastText: 'Look at my mukluks!',
-    face: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-  }, {
-    id: 4,
-    name: 'Mike Harrington',
-    lastText: 'This is wicked good ice cream.',
-    face: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-  }];
+    .factory('Chats', function () {
+        // Might use a resource here that returns a JSON array
 
-  return {
-    all: function() {
-      return chats;
-    },
-    remove: function(chat) {
-      chats.splice(chats.indexOf(chat), 1);
-    },
-    get: function(chatId) {
-      for (var i = 0; i < chats.length; i++) {
-        if (chats[i].id === parseInt(chatId)) {
-          return chats[i];
-        }
-      }
-      return null;
-    }
-  };
-})
+        // Some fake testing data
+        var chats = [{
+            id: 0,
+            name: 'Ben Sparrow',
+            lastText: 'You on your way?',
+            face: 'https://pbs.twimg.com/profile_images/514549811765211136/9SgAuHeY.png'
+        }, {
+            id: 1,
+            name: 'Max Lynx',
+            lastText: 'Hey, it\'s me',
+            face: 'https://avatars3.githubusercontent.com/u/11214?v=3&s=460'
+        }, {
+            id: 2,
+            name: 'Adam Bradleyson',
+            lastText: 'I should buy a boat',
+            face: 'https://pbs.twimg.com/profile_images/479090794058379264/84TKj_qa.jpeg'
+        }, {
+            id: 3,
+            name: 'Perry Governor',
+            lastText: 'Look at my mukluks!',
+            face: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
+        }, {
+            id: 4,
+            name: 'Mike Harrington',
+            lastText: 'This is wicked good ice cream.',
+            face: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
+        }];
+
+        return {
+            all: function () {
+                return chats;
+            },
+            remove: function (chat) {
+                chats.splice(chats.indexOf(chat), 1);
+            },
+            get: function (chatId) {
+                for (var i = 0; i < chats.length; i++) {
+                    if (chats[i].id === parseInt(chatId)) {
+                        return chats[i];
+                    }
+                }
+                return null;
+            }
+        };
+    })
 
     .factory('CustomerService', function ($http, basicURL) {
-      return {
-        get: function ($scope, customerId) {
-          $http({
-            method: 'GET',
-            url: basicURL + 'customer/' + customerId
-          }).success(function (response, status, headers, config) {
+        return {
+            get: function ($scope, customerId) {
+                $http({
+                    method: 'GET',
+                    url: basicURL + 'customer/' + customerId
+                }).success(function (response, status, headers, config) {
 
-            $scope.customer = response;
+                    $scope.customer = response;
 
-          }).error(function (response, status, headers, config) {
+                }).error(function (response, status, headers, config) {
 
-            $scope.customer = null;
-          });
-        },
+                    $scope.customer = null;
+                });
+            },
 
-        loadAllCustomers: function ($scope) {
+            loadAllCustomers: function ($scope) {
 
-          $http({
-            method: 'GET',
-            url: basicURL + 'customer/all'
-          }).success(function (response, status, headers, config) {
-            $scope.customers = response;
+                $http({
+                    method: 'GET',
+                    url: basicURL + 'customer/all'
+                }).success(function (response, status, headers, config) {
+                    $scope.customers = response;
 
-          }).error(function (response, status, headers, config) {
-            $scope.customers = null;
-          });
+                }).error(function (response, status, headers, config) {
+                    $scope.customers = null;
+                });
 
-        },
+            },
 
-        refreshCustomerList: function ($scope) {
-          this.loadAllCustomers($scope);
-          $scope.$broadcast('scroll.refreshComplete');
+            refreshCustomerList: function ($scope) {
+                this.loadAllCustomers($scope);
+                $scope.$broadcast('scroll.refreshComplete');
 
-        },
-        searchCustomers: function ($scope, inputValue) {
+            },
+            searchCustomers: function ($scope, inputValue) {
 
-          var fakecustomers = [{id: 1, name: '江李明', company: '汉询软件', phone: '13761209451'}];
-          $http({
-            method: 'GET',
-            url: basicURL + 'customer/search?queryParam=' + inputValue
-          }).success(function (response, status, headers, config) {
-            $scope.customers = response;
+                var fakecustomers = [{id: 1, name: '江李明', company: '汉询软件', phone: '13761209451'}];
+                $http({
+                    method: 'GET',
+                    url: basicURL + 'customer/search?queryParam=' + inputValue
+                }).success(function (response, status, headers, config) {
+                    $scope.customers = response;
 
-          }).error(function (response, status, headers, config) {
-            $scope.customers = fakecustomers;
-          });
+                }).error(function (response, status, headers, config) {
+                    $scope.customers = fakecustomers;
+                });
 
-        },
-        save: function ($scope, $state, customerId) {
-          $http({
-            method: 'POST',
-            url: basicURL + 'customer/save/',
-            data: $scope.customer
-          }).success(function (response, status, headers, config) {
+            },
+            save: function ($scope, $state, customerId) {
+                $http({
+                    method: 'POST',
+                    url: basicURL + 'customer/save/',
+                    data: $scope.customer
+                }).success(function (response, status, headers, config) {
 
-            $scope.customer = response;
+                    $scope.customer = response;
 
-            $scope.$emit('customer_saved_event', {type: customerId, customer: response});
+                    $scope.$emit('customer_saved_event', {type: customerId, customer: response});
 
-            $state.go('tab.customer');
+                    $state.go('tab.customer');
 
-          }).error(function (response, status, headers, config) {
+                }).error(function (response, status, headers, config) {
 
-            $scope.customers = null;
-          });
+                    $scope.customers = null;
+                });
 
+            }
         }
-      }
     });

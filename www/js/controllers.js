@@ -8,6 +8,8 @@ angular.module('starter.controllers', ['ionic-datepicker'])
 
             if (user && user.username && user.password) {
 
+                loginUser.username = user.username;
+
                 AuthenticationService.getToken(user);
 
             } else {
@@ -29,6 +31,7 @@ angular.module('starter.controllers', ['ionic-datepicker'])
                         case "6":
                             $state.go('tab.chats');
 
+                            loginUser.token = response.token;
                             user = response;
                             break;
                         default:
@@ -76,6 +79,7 @@ angular.module('starter.controllers', ['ionic-datepicker'])
         });
 
         $scope.conditions = [];
+        $scope.options = [];
 
         $rootScope.$on('search-report-conditions-load-event', function (event, data) {
 
@@ -85,11 +89,19 @@ angular.module('starter.controllers', ['ionic-datepicker'])
             UtilService.closeLoadingScreen();
         });
 
+        $rootScope.$on('search-report-options-load-event', function (event, data) {
+
+            if (data.options) {
+                $scope.options = data.options;
+            }
+            UtilService.closeLoadingScreen();
+        });
+
         $scope.openAutoComplete = function (condition) {
 
             if (condition.cankaodangan) {
                 //alert(JSON.stringify(condition));
-                $scope.openModal();
+                $scope.openModal(condition.cankaodangan);
             }
 
         };
@@ -97,9 +109,6 @@ angular.module('starter.controllers', ['ionic-datepicker'])
         $scope.goback = function () {
             $ionicHistory.goBack();
         };
-
-        var weekDaysList = ["六", "日", "一", "二", "三", "四", "五"];
-        var monthList = ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"];
 
         $scope.datepickerObject = {
             titleLabel: '选择日期',  //Optional
@@ -143,7 +152,9 @@ angular.module('starter.controllers', ['ionic-datepicker'])
             $scope.modal = modal;
         });
 
-        $scope.openModal = function () {
+        $scope.openModal = function (referenceProfile) {
+
+            ReportService.loadReportAutocompleteOptions(referenceProfile);
             $scope.modal.show();
         };
 

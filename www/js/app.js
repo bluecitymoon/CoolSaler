@@ -5,8 +5,12 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-var user = null;
+var loginUser = {};
 var mode = 'DEBUG';
+
+var weekDaysList = ["六", "日", "一", "二", "三", "四", "五"];
+var monthList = ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"];
+
 angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
 
     .constant('basicURL', 'http://localhost:8080/crud/rest/')
@@ -29,6 +33,10 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
             if (window.StatusBar) {
                 // org.apache.cordova.statusbar required
                 StatusBar.styleLightContent();
+            }
+
+            if (mode == 'DEBUG') {
+                loginUser = {username: 'admin', token: '0DPiKuNIrrVmD8IUCuw1hQxNqZc='};
             }
         });
     })

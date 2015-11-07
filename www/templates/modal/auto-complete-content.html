@@ -5,6 +5,15 @@
         </div>
     </ion-header-bar>
     <ion-content>
-        Hello!
+        <ion-list>
+            <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="option in options" type="item-text-wrap" href="#/searchreport/{{type.id}}">
+                {{option.mingcheng}}
+                <i class="icon ion-chevron-right icon-accessory"></i>
+
+                <ion-option-button class="button-calm" ng-click="">
+                    查看
+                </ion-option-button>
+            </ion-item>
+        </ion-list>
     </ion-content>
 </ion-modal-view>
