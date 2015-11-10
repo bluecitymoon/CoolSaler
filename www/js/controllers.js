@@ -91,12 +91,25 @@ angular.module('starter.controllers', ['ionic-datepicker'])
 
         $rootScope.$on('search-report-options-load-event', function (event, data) {
 
-            if (data.options.leibie) {
-                $scope.options = data.options.leibie;
-                console.debug(data.options);
-            } else {
-                $scope.options = [];
+            if (data.options) {
+                angular.forEach(data.options, function(value, key) {
+
+                    if (key == 'leibie') {
+                        $scope.options = value;
+                    } else {
+                        $scope.options = value;
+                    }
+
+                    console.debug(key);
+                    console.debug(value);
+                });
             }
+            //if (data.options.leibie) {
+            //    $scope.options = data.options.leibie;
+            //    console.debug(data.options);
+            //} else {
+            //    $scope.options = [];
+            //}
             UtilService.closeLoadingScreen();
         });
 
