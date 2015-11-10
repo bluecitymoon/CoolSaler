@@ -93,13 +93,13 @@ angular.module('starter.services', [])
 
         //canzhaoshuju/getshuju
 
-        function loadReportAutocompleteOptions(cankaodangan) {
+        function loadReportAutocompleteOptions(id) {
 
             //var copiedUserData = userData;
             //copiedUserData.cankaodangan = cankaodangan;
             $http({
                 url: ServerRoot + 'canzhaoshuju/getshuju',
-                data: {username: loginUser.username, token: loginUser.token, cankaodangan: cankaodangan},
+                data: {username: loginUser.username, token: loginUser.token, id: id},
                 method: 'POST'
             }).success(function (response, status, headers, config) {
 
@@ -112,7 +112,7 @@ angular.module('starter.services', [])
                     UtilService.showAlert(response.message);
 
                 } else {
-                    $rootScope.$emit('search-report-options-load-event', {conditions: response});
+                    $rootScope.$emit('search-report-options-load-event', {options: response});
                 }
 
             }).error(function (response, status, headers, config) {

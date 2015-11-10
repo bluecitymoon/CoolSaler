@@ -91,17 +91,20 @@ angular.module('starter.controllers', ['ionic-datepicker'])
 
         $rootScope.$on('search-report-options-load-event', function (event, data) {
 
-            if (data.options) {
-                $scope.options = data.options;
+            if (data.options.leibie) {
+                $scope.options = data.options.leibie;
+                console.debug(data.options);
+            } else {
+                $scope.options = [];
             }
             UtilService.closeLoadingScreen();
         });
 
         $scope.openAutoComplete = function (condition) {
 
-            if (condition.cankaodangan) {
+            if (condition.id) {
                 //alert(JSON.stringify(condition));
-                $scope.openModal(condition.cankaodangan);
+                $scope.openModal(condition.id);
             }
 
         };
@@ -152,9 +155,9 @@ angular.module('starter.controllers', ['ionic-datepicker'])
             $scope.modal = modal;
         });
 
-        $scope.openModal = function (referenceProfile) {
+        $scope.openModal = function (id) {
 
-            ReportService.loadReportAutocompleteOptions(referenceProfile);
+            ReportService.loadReportAutocompleteOptions(id);
             $scope.modal.show();
         };
 
