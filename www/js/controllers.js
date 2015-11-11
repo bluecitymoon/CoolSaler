@@ -2,6 +2,7 @@ angular.module('starter.controllers', ['ionic-datepicker'])
 
     .controller('LoginCtrl', function ($scope, AuthenticationService, $state, $rootScope, $ionicPopup, UtilService) {
 
+        $scope.user = {username: 'admin', password: 'admin'}
         $scope.signIn = function (user) {
 
             UtilService.showLoadingScreen('正在登录');
@@ -80,6 +81,7 @@ angular.module('starter.controllers', ['ionic-datepicker'])
 
         $scope.conditions = [];
         $scope.options = [];
+        $scope.allOptions = [];
 
         $rootScope.$on('search-report-conditions-load-event', function (event, data) {
 
@@ -95,7 +97,18 @@ angular.module('starter.controllers', ['ionic-datepicker'])
                 angular.forEach(data.options, function(value, key) {
 
                     if (key == 'leibie') {
-                        $scope.options = value;
+                        $scope.allOptions = value;
+
+                        var firstLevelOptions = [];
+                        angular.forEach(value, function(o, k) {
+
+                            if (o.bianma && o.bianma.length == 4) {
+                                firstLevelOptions.push(o);
+                            }
+                        });
+
+                        $scope.options = firstLevelOptions;
+
                     } else {
                         $scope.options = value;
                     }
@@ -114,12 +127,17 @@ angular.module('starter.controllers', ['ionic-datepicker'])
         });
 
         $scope.openAutoComplete = function (condition) {
-
+            //alert(JSON.stringify(condition));
             if (condition.id) {
-                //alert(JSON.stringify(condition));
+
                 $scope.openModal(condition.id);
             }
 
+        };
+
+        $scope.selectOptionContent = function(option) {
+            alert(JSON.stringify(option));
+            $scope.modal.hide();
         };
 
         $scope.goback = function () {

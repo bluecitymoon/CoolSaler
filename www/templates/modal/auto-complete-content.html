@@ -6,7 +6,7 @@
     </ion-header-bar>
     <ion-content>
         <ion-list>
-            <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="option in options" type="item-text-wrap" href="#/searchreport/{{type.id}}">
+            <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="option in options" type="item-text-wrap" ng-click="selectOptionContent(option)">
                 {{option.mingcheng}}
                 <i class="icon ion-chevron-right icon-accessory"></i>
 

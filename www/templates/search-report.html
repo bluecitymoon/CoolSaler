@@ -10,7 +10,7 @@
 
         <ion-list>
 
-            <label class="item item-input" ng-repeat="condition in conditions | orderBy: 'xuhao' ">
+            <div class="item item-input" ng-repeat="condition in conditions | orderBy: 'xuhao' ">
                 <span class="input-label">{{condition.mingcheng}}</span>
 
                 <div ng-if="condition.tjleixing == '区间'">
@@ -18,8 +18,8 @@
                     <div ng-switch="condition.sjleixing">
                         <div ng-switch-when="varchar(4000)">
                             <div class="row">
-                                <input type="text" ng-model="condition.moren1" placeholder="{{condition.xuhao}}">
-                                <input type="text" ng-model="condition.moren2" placeholder="{{condition.xuhao}}">
+                                <input type="text" ng-model="condition.moren1" placeholder="{{condition.id}}">
+                                <input type="text" ng-model="condition.moren2" placeholder="{{condition.id}}">
                             </div>
                         </div>
 
@@ -39,8 +39,10 @@
                 <div ng-if="condition.tjleixing != '区间'">
 
                     <div ng-switch="condition.sjleixing">
-                        <div ng-switch-when="varchar(4000)">
-                            <input type="text" ng-model="condition.moren1" placeholder="{{condition.xuhao}}" ng-click="openAutoComplete(condition)">
+                        <div ng-switch-when="varchar(4000)" class="row">
+
+                            <input type="text" ng-model="condition.moren1" placeholder="{{condition.id}}">
+                            <button class="button button-clear" ng-click="openAutoComplete(condition)"><i class="icon ion-ios-search-strong"></i></button>
                         </div>
                         <div ng-switch-when="datetime">
                             <div class="row">
@@ -51,7 +53,7 @@
                         </div>
                     </div>
                 </div>
-            </label>
+            </div>
         </ion-list>
         <div class="padding">
             <button class="button button-block button-positive">
