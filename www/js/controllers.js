@@ -69,7 +69,7 @@ angular.module('starter.controllers', ['ionic-datepicker'])
         });
     })
 
-    .controller('ReportSearchCtrl', function ($scope, ReportService, $rootScope, $stateParams, $ionicHistory, UtilService, $ionicModal) {
+    .controller('ReportSearchCtrl', function ($scope, ReportService, $rootScope, $stateParams, $ionicHistory, UtilService, $ionicModal, $ionicActionSheet) {
 
         $scope.$on('$ionicView.enter', function (e) {
 
@@ -91,6 +91,7 @@ angular.module('starter.controllers', ['ionic-datepicker'])
             UtilService.closeLoadingScreen();
         });
 
+        $scope.currentOptionsType = '';
         $rootScope.$on('search-report-options-load-event', function (event, data) {
 
             if (data.options) {
@@ -113,32 +114,84 @@ angular.module('starter.controllers', ['ionic-datepicker'])
                         $scope.options = value;
                     }
 
+                    $scope.currentOptionsType = key;
+
                     console.debug(key);
                     console.debug(value);
                 });
             }
-            //if (data.options.leibie) {
-            //    $scope.options = data.options.leibie;
-            //    console.debug(data.options);
-            //} else {
-            //    $scope.options = [];
-            //}
+
             UtilService.closeLoadingScreen();
         });
+
+        $scope.showSecondLevelOptionsOrCloseDialog = function(option) {
+
+            if ($scope.currentOptionsType == 'leibie') {
+
+                var secondLevelOptions = {};
+
+                if (option.bianma) {
+                    secondLevelOptions = getSecondLevelOptions(option.bianma);
+                } else {
+                    return;
+                }
+
+                if (secondLevelOptions.length > 0) {
+                    // Show the action sheet
+                    var hideSheet = $ionicActionSheet.show({
+                        buttons: secondLevelOptions,
+
+                        titleText: '选择详细选项',
+                        cancelText: '取消',
+                        cancel: function() {
+
+                        },
+                        buttonClicked: function(index, value) {
+
+                            console.debug(index);
+                            console.debug(value);
+
+                            return true;
+                        }
+                    });
+
+                } else {
+
+                }
+            }
+
+
+        };
+
+        function getSecondLevelOptions(firstLevelOption) {
+
+            var secondLevelOptions = [];
+            angular.forEach($scope.allOptions, function(option, i) {
+
+                if (option.bianma && option.bianma.length > 4) {
+
+                    if(option.bianma.indexOf(firstLevelOption) > -1 ) {
+                        secondLevelOptions.push({text : option.mingcheng});
+                    }
+                }
+            });
+
+            return secondLevelOptions;
+        };
 
         $scope.openAutoComplete = function (condition) {
             //alert(JSON.stringify(condition));
             if (condition.id) {
 
-                $scope.openModal(condition.id);
+                $scope.openModal(condition);
             }
 
         };
 
-        $scope.selectOptionContent = function(option) {
-            alert(JSON.stringify(option));
-            $scope.modal.hide();
-        };
+        //$scope.selectOptionContent = function(option) {
+        //    alert(JSON.stringify(option));
+        //    $scope.modal.hide();
+        //};
 
         $scope.goback = function () {
             $ionicHistory.goBack();
@@ -186,9 +239,12 @@ angular.module('starter.controllers', ['ionic-datepicker'])
             $scope.modal = modal;
         });
 
-        $scope.openModal = function (id) {
+        $scope.currentCondition = {};
+        $scope.openModal = function (condition) {
 
-            ReportService.loadReportAutocompleteOptions(id);
+            ReportService.loadReportAutocompleteOptions(condition.id);
+
+            $scope.currentCondition = condition;
             $scope.modal.show();
         };
 
