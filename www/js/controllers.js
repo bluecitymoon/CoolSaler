@@ -51,7 +51,7 @@ angular.module('starter.controllers', ['ionic-datepicker'])
     .controller('DataCtrl', function () {
 
     })
-    .controller('ReportTypesCtrl', function ($scope, ReportService, $rootScope) {
+    .controller('ReportTypesCtrl', function ($scope, ReportService, $rootScope, UtilService) {
 
         $scope.$on('$ionicView.enter', function (e) {
             ReportService.getTypes();
@@ -64,8 +64,8 @@ angular.module('starter.controllers', ['ionic-datepicker'])
             if (data.types) {
                 $scope.types = data.types;
 
-                //$scope.$applyAsync();
             }
+            UtilService.closeLoadingScreen();
         });
     })
 
@@ -73,7 +73,6 @@ angular.module('starter.controllers', ['ionic-datepicker'])
 
         $scope.$on('$ionicView.enter', function (e) {
 
-            UtilService.showLoadingScreen('正在载入');
             var typeId = $stateParams.typeid;
 
             ReportService.loadReportSearchConditions(typeId);
@@ -82,6 +81,7 @@ angular.module('starter.controllers', ['ionic-datepicker'])
         $scope.conditions = [];
         $scope.options = [];
         $scope.allOptions = [];
+        $scope.detailOptions = [];
 
         $rootScope.$on('search-report-conditions-load-event', function (event, data) {
 
@@ -91,7 +91,16 @@ angular.module('starter.controllers', ['ionic-datepicker'])
             UtilService.closeLoadingScreen();
         });
 
+        $rootScope.$on('search-option-detail-load-event', function (event, data) {
+
+            if (data.detailOptions) {
+                $scope.detailOptions = data.detailOptions;
+            }
+            UtilService.closeLoadingScreen();
+        });
+
         $scope.currentOptionsType = '';
+        $scope.currentSelectCondition = {};
         $rootScope.$on('search-report-options-load-event', function (event, data) {
 
             if (data.options) {
@@ -124,11 +133,22 @@ angular.module('starter.controllers', ['ionic-datepicker'])
             UtilService.closeLoadingScreen();
         });
 
+        $scope.keywordCondition = {name : ''};
+        $scope.searchFinalOptions = function() {
+
+            ReportService.loadFinalOptionResultWithCategory();
+
+        };
+
+        $scope.searchOptionsWithKeyword = function() {
+            ReportService.searchOptionsWithKeyword($scope.keywordCondition.name, $scope.currentSelectCondition.id);
+        };
+
         $scope.showSecondLevelOptionsOrCloseDialog = function(option) {
 
             if ($scope.currentOptionsType == 'leibie') {
 
-                var secondLevelOptions = {};
+                var secondLevelOptions = [];
 
                 if (option.bianma) {
                     secondLevelOptions = getSecondLevelOptions(option.bianma);
@@ -137,41 +157,34 @@ angular.module('starter.controllers', ['ionic-datepicker'])
                 }
 
                 if (secondLevelOptions.length > 0) {
-                    // Show the action sheet
-                    var hideSheet = $ionicActionSheet.show({
-                        buttons: secondLevelOptions,
 
-                        titleText: '选择详细选项',
-                        cancelText: '取消',
-                        cancel: function() {
-
-                        },
-                        buttonClicked: function(index, value) {
-
-                            console.debug(index);
-                            console.debug(value);
-
-                            return true;
-                        }
-                    });
-
+                    $scope.options = secondLevelOptions;
                 } else {
 
                 }
-            }
 
+            } else {
+
+                $scope.currentSelectCondition.moren1 = option.mingcheng;
+                $scope.modal.hide();
+            }
 
         };
 
         function getSecondLevelOptions(firstLevelOption) {
 
             var secondLevelOptions = [];
+            var firstLevelOptionLength = firstLevelOption.length;
             angular.forEach($scope.allOptions, function(option, i) {
 
                 if (option.bianma && option.bianma.length > 4) {
 
-                    if(option.bianma.indexOf(firstLevelOption) > -1 ) {
-                        secondLevelOptions.push({text : option.mingcheng});
+                    var secondLevelOptionLength = option.bianma.length;
+                    var gap = secondLevelOptionLength - firstLevelOptionLength;
+
+                    if(gap == 2 && option.bianma.indexOf(firstLevelOption) > -1 ) {
+                        //{text : option.mingcheng}
+                        secondLevelOptions.push(option);
                     }
                 }
             });
@@ -179,19 +192,30 @@ angular.module('starter.controllers', ['ionic-datepicker'])
             return secondLevelOptions;
         };
 
+        $scope.doRefresh = function() {
+            $http.get('/new-items')
+                .success(function(newItems) {
+                    $scope.items = newItems;
+                })
+                .finally(function() {
+                    // Stop the ion-refresher from spinning
+                    $scope.$broadcast('scroll.refreshComplete');
+                });
+        };
+
+        $scope.queryReport = function() {
+
+            ReportService.queryReport($scope.conditions);
+        };
+
         $scope.openAutoComplete = function (condition) {
-            //alert(JSON.stringify(condition));
+            $scope.currentSelectCondition = condition;
             if (condition.id) {
 
                 $scope.openModal(condition);
             }
 
         };
-
-        //$scope.selectOptionContent = function(option) {
-        //    alert(JSON.stringify(option));
-        //    $scope.modal.hide();
-        //};
 
         $scope.goback = function () {
             $ionicHistory.goBack();
@@ -223,11 +247,26 @@ angular.module('starter.controllers', ['ionic-datepicker'])
             closeOnSelect: false //Optional
         };
 
+        $scope.currentSelectPositionType = 'moren1';
+        $scope.openDateDialog = function(condition, type) {
+
+            $scope.currentSelectCondition = condition;
+            $scope.currentSelectPositionType = type;
+        };
+
         function datePickerCallback(val) {
 
             if (typeof(val) === 'undefined') {
                 console.log('Date not selected');
             } else {
+
+
+                if ($scope.currentSelectPositionType === 'moren2') {
+                    $scope.currentSelectCondition.moren2 = val;
+                } else {
+                    $scope.currentSelectCondition.moren1 = val;
+                }
+
                 console.log('Selected date is : ', val);
             }
         }
@@ -239,12 +278,12 @@ angular.module('starter.controllers', ['ionic-datepicker'])
             $scope.modal = modal;
         });
 
-        $scope.currentCondition = {};
+
         $scope.openModal = function (condition) {
 
+            $scope.keywordCondition.name = '';
             ReportService.loadReportAutocompleteOptions(condition.id);
 
-            $scope.currentCondition = condition;
             $scope.modal.show();
         };
 

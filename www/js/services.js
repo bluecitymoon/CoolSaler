@@ -43,7 +43,7 @@ angular.module('starter.services', [])
         }
 
         function getTypes() {
-
+            UtilService.showLoadingScreen();
             $http({
                 url: ServerRoot + 'report/getreport',
                 data: userData,
@@ -58,13 +58,13 @@ angular.module('starter.services', [])
                 }
 
             }).error(function (response, status, headers, config) {
-                //TODO
+                UtilService.handleCommonServerError(response, status);
             });
 
         }
 
         function loadReportSearchConditions(reportid) {
-
+            UtilService.showLoadingScreen();
             //var copiedUserData = userData;
             //copiedUserData.bbid = reportid;
 
@@ -84,17 +84,18 @@ angular.module('starter.services', [])
 
                 } else {
                     $rootScope.$emit('search-report-conditions-load-event', {conditions: response});
+
                 }
 
             }).error(function (response, status, headers, config) {
-                //TODO
+                UtilService.handleCommonServerError(response, status);
             });
         }
 
         //canzhaoshuju/getshuju
 
         function loadReportAutocompleteOptions(id) {
-
+            UtilService.showLoadingScreen();
             //var copiedUserData = userData;
             //copiedUserData.cankaodangan = cankaodangan;
             $http({
@@ -116,14 +117,116 @@ angular.module('starter.services', [])
                 }
 
             }).error(function (response, status, headers, config) {
-                //TODO
+                UtilService.handleCommonServerError(response, status);
             });
         }
+
+        function loadFinalOptionResultWithCategory(keyword) {
+            UtilService.showLoadingScreen();
+            //search-option-detail-load-event
+            $http({
+                url: ServerRoot + 'canzhaoshuju/getshujulbfy',
+                data: {username: loginUser.username, token: loginUser.token, id: id},
+                method: 'POST'
+            }).success(function (response, status, headers, config) {
+
+                console.debug(response);
+
+                if (response.code) {
+
+                    UtilService.closeLoadingScreen();
+
+                    UtilService.showAlert(response.message);
+
+                } else {
+                    $rootScope.$emit('search-option-detail-load-event', {detailOptions: response});
+                }
+
+            }).error(function (response, status, headers, config) {
+                UtilService.handleCommonServerError(response, status);
+            });
+        };
+
+        function searchOptionsWithKeyword(keyword, id, page) {
+            UtilService.showLoadingScreen();
+
+            var pageNumber = 1;
+            if (page) {
+                pageNumber = page;
+            }
+            var queryData = {username: loginUser.username, token: loginUser.token, id: id, guanjianzi: keyword, yeshu: pageNumber};
+            console.debug(JSON.stringify(queryData));
+            $http({
+                url: ServerRoot + 'canzhaoshuju/getshujucxfy',
+                data: queryData,
+                method: 'POST'
+            }).success(function (response, status, headers, config) {
+
+                console.debug(response);
+
+                if (response.code) {
+
+                    UtilService.closeLoadingScreen();
+
+                    UtilService.showAlert(response.message);
+
+                } else {
+                    $rootScope.$emit('search-option-detail-load-event', {detailOptions: response});
+                }
+
+            }).error(function (response, status, headers, config) {
+                UtilService.handleCommonServerError(response, status);
+            });
+        };
+
+        function queryReport(conditions) {
+            UtilService.showLoadingScreen();
+            var conditionData = [];
+
+            angular.forEach(conditions, function(value, key) {
+
+                if(value.moren1 || value.moren2) {
+                    var singleCondition = {id: value.id, moren1: value.moren1, moren2: value.moren2};
+                    conditionData.push(singleCondition);
+                }
+            });
+
+            var conditionDataJSONstring = JSON.stringify(conditionData).replace(/"/g, '\'');
+            var queryData = {username: loginUser.username, token: loginUser.token, tiaojian: conditionDataJSONstring};
+            console.debug(JSON.stringify(queryData));
+            $http({
+                url: ServerRoot + 'report/getreportdata',
+                data: queryData,
+                method: 'POST'
+            }).success(function (response, status, headers, config) {
+
+                console.debug(response);
+
+                if (response.code) {
+
+                    UtilService.closeLoadingScreen();
+
+                    UtilService.showAlert(response.message);
+
+                } else {
+                    $rootScope.$emit('search-option-detail-load-event', {detailOptions: response});
+                }
+
+            }).error(function (response, status, headers, config) {
+
+                UtilService.handleCommonServerError(response, status);
+
+            });
+        };
+
 
         return {
             getTypes: getTypes,
             loadReportSearchConditions: loadReportSearchConditions,
-            loadReportAutocompleteOptions: loadReportAutocompleteOptions
+            loadReportAutocompleteOptions: loadReportAutocompleteOptions,
+            loadFinalOptionResultWithCategory: loadFinalOptionResultWithCategory,
+            searchOptionsWithKeyword: searchOptionsWithKeyword,
+            queryReport: queryReport
         }
     })
 
@@ -161,10 +264,22 @@ angular.module('starter.services', [])
             }
         }
 
+        function handleCommonServerError(response, statusCode) {
+
+            closeLoadingScreen();
+
+            if (response) {
+                showAlert(response);
+            } else {
+                showAlert("服务器在处理你的请求时发生了错误。");
+            }
+        }
+
         return {
             showLoadingScreen: showLoadingScreen,
             closeLoadingScreen: closeLoadingScreen,
-            showAlert: showAlert
+            showAlert: showAlert,
+            handleCommonServerError : handleCommonServerError
         }
     })
 
