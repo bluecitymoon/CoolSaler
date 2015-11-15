@@ -121,12 +121,12 @@ angular.module('starter.services', [])
             });
         }
 
-        function loadFinalOptionResultWithCategory(keyword) {
+        function loadFinalOptionResultWithCategory(conditionId, optionId) {
             UtilService.showLoadingScreen();
             //search-option-detail-load-event
             $http({
                 url: ServerRoot + 'canzhaoshuju/getshujulbfy',
-                data: {username: loginUser.username, token: loginUser.token, id: id},
+                data: {username: loginUser.username, token: loginUser.token, id: conditionId, leibieid: optionId},
                 method: 'POST'
             }).success(function (response, status, headers, config) {
 
@@ -171,7 +171,7 @@ angular.module('starter.services', [])
                     UtilService.showAlert(response.message);
 
                 } else {
-                    $rootScope.$emit('search-option-detail-load-event', {detailOptions: response});
+                    $rootScope.$emit('search-report-options-load-event', {options: response});
                 }
 
             }).error(function (response, status, headers, config) {
@@ -193,7 +193,10 @@ angular.module('starter.services', [])
 
             var conditionDataJSONstring = JSON.stringify(conditionData).replace(/"/g, '\'');
             var queryData = {username: loginUser.username, token: loginUser.token, tiaojian: conditionDataJSONstring};
-            console.debug(JSON.stringify(queryData));
+
+            if (mode == 'DEBUG') {
+                queryData = {"username":"admin","token":"0DPiKuNIrrVmD8IUCuw1hQxNqZc=","tiaojian":"[{'id':1196,'moren1':'2013-10-31T16:00:00.000Z','moren2':'2015-11-14T16:00:00.000Z'}]"};
+            }
             $http({
                 url: ServerRoot + 'report/getreportdata',
                 data: queryData,
@@ -209,7 +212,7 @@ angular.module('starter.services', [])
                     UtilService.showAlert(response.message);
 
                 } else {
-                    $rootScope.$emit('search-option-detail-load-event', {detailOptions: response});
+                    $rootScope.$emit('search-report-load-event', {reports: response});
                 }
 
             }).error(function (response, status, headers, config) {
@@ -219,6 +222,16 @@ angular.module('starter.services', [])
             });
         };
 
+        var lastSearchCondition = {};
+        function setLastSearchCondition(searchCondition) {
+
+            lastSearchCondition = searchCondition;
+        }
+
+        function getLastSearchCondition() {
+
+            return lastSearchCondition;
+        }
 
         return {
             getTypes: getTypes,
@@ -226,7 +239,9 @@ angular.module('starter.services', [])
             loadReportAutocompleteOptions: loadReportAutocompleteOptions,
             loadFinalOptionResultWithCategory: loadFinalOptionResultWithCategory,
             searchOptionsWithKeyword: searchOptionsWithKeyword,
-            queryReport: queryReport
+            queryReport: queryReport,
+            setLastSearchCondition: setLastSearchCondition,
+            getLastSearchCondition: getLastSearchCondition
         }
     })
 
@@ -271,7 +286,7 @@ angular.module('starter.services', [])
             if (response) {
                 showAlert(response);
             } else {
-                showAlert("服务器在处理你的请求时发生了错误。");
+                showAlert("服务器出错。");
             }
         }
 

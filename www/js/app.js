@@ -81,6 +81,13 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
                 controller: 'ReportSearchCtrl'
 
             })
+
+            .state('report-search-result', {
+                url: '/reports',
+                templateUrl: 'templates/report/reports.html',
+                controller: 'ReportResultCtrl'
+
+            })
             .state('tab.data', {
                 url: '/data',
                 views: {

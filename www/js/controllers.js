@@ -69,7 +69,27 @@ angular.module('starter.controllers', ['ionic-datepicker'])
         });
     })
 
-    .controller('ReportSearchCtrl', function ($scope, ReportService, $rootScope, $stateParams, $ionicHistory, UtilService, $ionicModal, $ionicActionSheet) {
+    .controller('ReportResultCtrl', function ($rootScope, $scope, $state, UtilService, ReportService) {
+
+        $scope.$on('$ionicView.enter', function (e) {
+
+            ReportService.queryReport(ReportService.getLastSearchCondition());
+        });
+
+        $scope.reports = [];
+        $rootScope.$on('search-report-load-event', function (event, data) {
+
+            if (data.reports) {
+                $scope.reports = data.reports;
+                console.debug(data.reports);
+
+            }
+
+            UtilService.closeLoadingScreen();
+        });
+    })
+
+    .controller('ReportSearchCtrl', function ($scope, ReportService, $rootScope, $stateParams, $ionicHistory, UtilService, $ionicModal, $ionicActionSheet, $state) {
 
         $scope.$on('$ionicView.enter', function (e) {
 
@@ -81,7 +101,7 @@ angular.module('starter.controllers', ['ionic-datepicker'])
         $scope.conditions = [];
         $scope.options = [];
         $scope.allOptions = [];
-        $scope.detailOptions = [];
+        //$scope.detailOptions = [];
 
         $rootScope.$on('search-report-conditions-load-event', function (event, data) {
 
@@ -91,13 +111,13 @@ angular.module('starter.controllers', ['ionic-datepicker'])
             UtilService.closeLoadingScreen();
         });
 
-        $rootScope.$on('search-option-detail-load-event', function (event, data) {
-
-            if (data.detailOptions) {
-                $scope.detailOptions = data.detailOptions;
-            }
-            UtilService.closeLoadingScreen();
-        });
+        //$rootScope.$on('search-option-detail-load-event', function (event, data) {
+        //
+        //    if (data.detailOptions) {
+        //        $scope.detailOptions = data.detailOptions;
+        //    }
+        //    UtilService.closeLoadingScreen();
+        //});
 
         $scope.currentOptionsType = '';
         $scope.currentSelectCondition = {};
@@ -134,14 +154,27 @@ angular.module('starter.controllers', ['ionic-datepicker'])
         });
 
         $scope.keywordCondition = {name : ''};
-        $scope.searchFinalOptions = function() {
+        $scope.searchFinalOptions = function(option) {
 
-            ReportService.loadFinalOptionResultWithCategory();
+            var keyword = '';
+            if (option && option.mingcheng) {
+                keyword == option.mingcheng;
+            } else {
+                keyword = $scope.keywordCondition;
+            }
+
+            ReportService.loadFinalOptionResultWithCategory($scope.currentSelectCondition.id, option.id,  keyword);
 
         };
 
         $scope.searchOptionsWithKeyword = function() {
-            ReportService.searchOptionsWithKeyword($scope.keywordCondition.name, $scope.currentSelectCondition.id);
+
+            if ($scope.currentOptionsType == 'leibie') {
+                ReportService.searchOptionsWithKeyword($scope.keywordCondition.name, $scope.currentSelectCondition.id);
+            } else {
+                ReportService.loadFinalOptionResultWithCategory($scope.currentSelectCondition.id, option.id,  keyword);
+            }
+
         };
 
         $scope.showSecondLevelOptionsOrCloseDialog = function(option) {
@@ -160,7 +193,7 @@ angular.module('starter.controllers', ['ionic-datepicker'])
 
                     $scope.options = secondLevelOptions;
                 } else {
-
+                    ReportService.loadFinalOptionResultWithCategory($scope.currentSelectCondition.id, option.id);
                 }
 
             } else {
@@ -205,7 +238,8 @@ angular.module('starter.controllers', ['ionic-datepicker'])
 
         $scope.queryReport = function() {
 
-            ReportService.queryReport($scope.conditions);
+            ReportService.setLastSearchCondition($scope.conditions);
+            $state.go('report-search-result');
         };
 
         $scope.openAutoComplete = function (condition) {
